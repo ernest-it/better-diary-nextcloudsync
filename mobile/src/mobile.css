@@ -1,0 +1,234 @@
+/* The phone. Loaded after src/styles.css in the Android build only, and built entirely from
+   its tokens, so both themes carry over without a colour of their own.
+
+   The desktop layout already collapses the sidebar into an overlay below 680px; this
+   finishes that into a drawer, makes room for fingers and the on-screen keyboard, and
+   styles the three things only the phone has: the Nextcloud setup screen, the photo
+   viewer and the overflow menu. */
+
+/* ---------------------------------------------------------------- the frame */
+
+/* The on-screen keyboard shrinks the dynamic viewport; 100vh would leave the caret under it. */
+.is-android .app-shell { height: 100dvh; }
+
+/* Android draws the app edge to edge; keep the chrome clear of the status bar, the camera
+   cut-out and the gesture bar. */
+.is-android .app-shell,
+.is-android .boot-screen {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.is-android .workspace { padding-bottom: env(safe-area-inset-bottom); }
+.is-android .toast { bottom: calc(18px + env(safe-area-inset-bottom)); max-width: calc(100vw - 32px); }
+
+/* Fingers, not a pointer. */
+.is-android .icon-btn { width: 40px; height: 40px; font-size: var(--fs-xl); }
+.is-android .toolbar button { min-width: 38px; height: 38px; }
+.is-android .btn { padding: 10px 16px; }
+.is-android .plain-btn { padding: 11px 8px; }
+
+/* Hover never happens on a touchscreen, so a section's tools are simply shown. */
+.is-android .section-tools { opacity: 1; }
+
+/* Keyboard hints mean nothing without a keyboard. */
+.is-android .search-hint { font-size: 0; }
+.is-android .search-hint kbd { display: none; }
+.is-android .search-hint .show-all { font-size: var(--fs-sm); }
+
+@media (max-width: 680px) {
+  .is-android .topbar { padding: 0 6px; gap: 2px; height: 54px; }
+  .is-android .saved { margin-left: 2px; }
+  .is-android .saved span { display: none; }
+  .is-android .day-label { padding: 0 2px; }
+
+  /* The formatting bar scrolls sideways rather than wrapping into two rows. */
+  .is-android .toolbar { overflow-x: auto; scrollbar-width: none; padding: 4px 6px; }
+  .is-android .toolbar::-webkit-scrollbar { display: none; }
+  .is-android .toolbar .fill { min-width: 8px; }
+
+  .is-android .page { padding: 22px 16px 40vh; }
+  .is-android .notice { flex-direction: column; align-items: stretch; }
+  .is-android .notice-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .is-android .tag-view-head { flex-wrap: wrap; }
+
+  .is-android .dialog { max-height: calc(100dvh - 24px); }
+  .is-android .dialog-backdrop { padding: 12px; }
+  .is-android .search-overlay { padding: calc(12px + env(safe-area-inset-top)) 12px 12px; }
+  .is-android .field-row { flex-wrap: wrap; }
+
+  /* The drawer: over the page, with a scrim that closes it (see bridge.js). */
+  .is-android .app-shell .sidebar {
+    z-index: 50;
+    width: min(300px, 86vw);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    transition: transform .2s ease, opacity .2s ease;
+  }
+  .is-android .app-shell::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: var(--scrim);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .is-android .app-shell:not(.no-sidebar)::after { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- sync status */
+
+.storage.syncing .status-dot { background: var(--accent-line); }
+.storage.offline .status-dot { background: var(--faint); }
+.storage.sync-error .status-dot { background: var(--danger); }
+
+/* ---------------------------------------------------------------- the overflow menu */
+
+.overflow-menu {
+  position: fixed;
+  z-index: var(--z-menu);
+  top: calc(52px + env(safe-area-inset-top));
+  right: calc(8px + env(safe-area-inset-right));
+  min-width: 220px;
+  padding: 5px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-menu);
+}
+.overflow-menu[hidden] { display: none; }
+.overflow-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-md);
+  text-align: left;
+}
+.overflow-menu button:active { background: var(--surface-hover); }
+.overflow-menu button.danger { color: var(--danger-ink); }
+.overflow-menu hr { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; }
+
+/* ---------------------------------------------------------------- the photo viewer */
+
+.photo-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  display: grid;
+  place-items: center;
+  background: rgba(12, 11, 9, .94);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.photo-viewer[hidden] { display: none; }
+.photo-viewer img { max-width: 100vw; max-height: 100dvh; object-fit: contain; }
+.photo-viewer-close {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top));
+  right: calc(10px + env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+}
+
+/* ---------------------------------------------------------------- setup */
+
+.setup {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  overflow-y: auto;
+  background: var(--bg);
+  padding: calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+}
+.setup[hidden] { display: none; }
+.setup-card {
+  max-width: 440px;
+  margin: 6vh auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.setup-card .empty-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+  font-size: var(--fs-2xl);
+  margin-bottom: 4px;
+}
+.setup-card h2 { font-family: var(--font-serif); font-size: var(--fs-3xl); font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
+.setup-card > p { color: var(--muted); font-size: var(--fs-md); line-height: 1.6; margin-bottom: 8px; }
+.setup-form { display: flex; flex-direction: column; gap: 6px; }
+.setup-input {
+  width: 100%;
+  padding: 12px 13px;
+  font-size: var(--fs-lg);
+  border: 1px solid var(--line-control);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--text);
+}
+.setup-input:focus { outline: 2px solid var(--ring); outline-offset: 1px; }
+.setup-error { color: var(--danger-ink); font-size: var(--fs-base); line-height: 1.5; min-height: 1em; }
+.setup-error:empty { display: none; }
+.setup-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.setup-actions .ghost { margin-right: auto; }
+
+.setup-waiting { display: flex; align-items: center; gap: 12px; color: var(--text-2); font-size: var(--fs-md); padding: 10px 0; }
+.setup-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-soft);
+  border-top-color: var(--accent);
+  animation: setup-spin .8s linear infinite;
+}
+@keyframes setup-spin { to { transform: rotate(360deg); } }
+
+.setup-folders {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  overflow: hidden;
+  max-height: 42vh;
+  overflow-y: auto;
+}
+.setup-folders:empty { display: none; }
+.setup-folder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: none;
+  color: var(--text);
+  font-size: var(--fs-md);
+  text-align: left;
+}
+.setup-folder:last-child { border-bottom: 0; }
+.setup-folder:active { background: var(--surface-hover); }
+.setup-folder.up { color: var(--muted); }
+.setup-folder span { width: 18px; text-align: center; color: var(--muted); }
+
+/* .folder-btn's display: flex outranks the hidden attribute; on the phone the overflow
+   menu's "Open in Nextcloud" does its job. */
+.is-android #revealBtn { display: none; }
+/* Same for "Help & shortcuts": it lists keyboard shortcuts. */
+.is-android #shortcutsBtn { display: none; }

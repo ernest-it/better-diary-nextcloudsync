@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob: diary-asset:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'" />
+    <title>daily-diary</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div class="boot-screen" id="bootScreen" role="status" aria-live="polite">
+      <div class="empty-icon" aria-hidden="true">❦</div>
+      <h2 id="bootTitle">Opening your diary…</h2>
+      <p id="bootMessage">Reading today's entry.</p>
+      <div class="field-control" id="bootActions" hidden>
+        <button type="button" class="btn" id="bootRetry">Try again</button>
+        <button type="button" class="btn primary" id="bootChoose">Choose a folder…</button>
+      </div>
+    </div>
+
+    <div class="app-shell" id="appShell" hidden>
+      <aside class="sidebar" id="sidebar">
+        <div class="brand"><div class="brand-mark" aria-hidden="true">❦</div><span>daily-diary</span></div>
+
+        <div class="sidebar-scroll">
+          <button type="button" class="today-btn" id="todayBtn">
+            <span aria-hidden="true">✎</span> Today's entry <kbd id="todayKbd">Ctrl T</kbd>
+          </button>
+
+          <section class="cal" aria-labelledby="calTitle">
+            <div class="cal-head">
+              <button type="button" class="cal-step" id="calPrev" title="Previous month" aria-label="Previous month">‹</button>
+              <button type="button" class="cal-title" id="calTitle" title="Back to the month you are reading">September 2026</button>
+              <button type="button" class="cal-step" id="calNext" title="Next month" aria-label="Next month">›</button>
+            </div>
+            <div class="cal-grid" id="calGrid" role="grid" aria-labelledby="calTitle"></div>
+            <div class="cal-foot" id="calFoot"></div>
+          </section>
+
+          <div class="section-label" id="recentLabel">Recent entries <span class="count" id="recentCount"></span></div>
+          <nav class="entry-list" id="recentList" aria-labelledby="recentLabel"></nav>
+
+          <div class="section-label" id="onThisDayLabel">On this day</div>
+          <nav class="entry-list" id="onThisDayList" aria-labelledby="onThisDayLabel"></nav>
+
+          <div class="section-label" id="tagsLabel">Tags <span class="count" id="tagCount"></span></div>
+          <nav class="tag-list" id="tagList" aria-labelledby="tagsLabel"></nav>
+        </div>
+
+        <div class="sidebar-bottom">
+          <button type="button" class="plain-btn" id="settingsBtn"><span aria-hidden="true">⚙</span> Settings</button>
+          <button type="button" class="plain-btn" id="shortcutsBtn"><span aria-hidden="true">?</span> Help &amp; shortcuts</button>
+          <div class="storage" title="Where your diary is stored">
+            <span class="status-dot" aria-hidden="true"></span><span class="path" id="storagePath"></span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <button type="button" class="icon-btn" id="sidebarToggle" title="Show or hide the sidebar (Ctrl+\)" aria-label="Show or hide the sidebar" aria-expanded="true">☰</button>
+          <div class="day-nav">
+            <button type="button" class="icon-btn" id="prevDay" title="Previous day (Alt+←)" aria-label="Previous day">‹</button>
+            <span class="day-label" id="dayLabel"></span>
+            <button type="button" class="icon-btn" id="nextDay" title="Next day (Alt+→)" aria-label="Next day">›</button>
+          </div>
+          <span class="saved" id="savedWrap"><i aria-hidden="true"></i><span id="savedState" role="status">Saved</span></span>
+          <div class="top-actions">
+            <button type="button" class="icon-btn" id="searchBtn" title="Search your diary (Ctrl+K)" aria-label="Search your diary">⌕</button>
+            <button type="button" class="icon-btn" id="exportBtn" title="Export this entry (Ctrl+E)" aria-label="Export this entry">⇧</button>
+            <button type="button" class="folder-btn" id="revealBtn" title="Open the diary folder"><span aria-hidden="true">🗀</span><span>Open folder</span></button>
+          </div>
+        </header>
+
+        <div class="toolbar" role="toolbar" aria-label="Formatting" id="toolbar">
+          <button type="button" data-cmd="undo" title="Undo" aria-label="Undo">↶</button>
+          <button type="button" data-cmd="redo" title="Redo" aria-label="Redo">↷</button>
+          <span class="sep" aria-hidden="true"></span>
+          <button type="button" data-cmd="bold" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
+          <button type="button" data-cmd="italic" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button>
+          <button type="button" data-cmd="underline" title="Underline (Ctrl+U)" aria-label="Underline"><u>U</u></button>
+          <button type="button" data-cmd="hiliteColor" title="Highlight" aria-label="Highlight">▨</button>
+          <span class="sep" aria-hidden="true"></span>
+          <button type="button" data-cmd="insertUnorderedList" title="Bulleted list" aria-label="Bulleted list">☷</button>
+          <button type="button" data-cmd="insertOrderedList" title="Numbered list" aria-label="Numbered list">☰</button>
+          <button type="button" data-cmd="formatBlock" data-value="blockquote" title="Quote" aria-label="Quote">❝</button>
+          <span class="sep" aria-hidden="true"></span>
+          <button type="button" class="labelled" id="photoBtn" title="Add a photo (Ctrl+Shift+P)" aria-label="Add a photo">Photo</button>
+          <span class="fill" aria-hidden="true"></span>
+          <span class="word-count" id="wordCount" role="status">0 words</span>
+        </div>
+
+        <div class="workspace" id="workspace">
+          <article class="page">
+            <div class="notice" id="notice" hidden>
+              <span class="notice-text" id="noticeText"></span>
+              <span class="notice-actions">
+                <button type="button" class="btn" id="noticeKeep">Keep mine</button>
+                <button type="button" class="btn primary" id="noticeLoad">Load theirs</button>
+              </span>
+            </div>
+
+            <header class="page-head">
+              <div class="eyebrow" id="entryEyebrow"></div>
+              <h1 class="entry-date" id="entryDate"></h1>
+              <div class="entry-meta" id="entryMeta"></div>
+              <div class="tag-row" id="tagRow" aria-label="Tags on this entry"></div>
+            </header>
+
+            <div class="sections" id="sections"></div>
+            <button type="button" class="add-section" id="addSection"><span aria-hidden="true">＋</span> Add a section</button>
+          </article>
+
+          <section class="tag-view" id="tagView" aria-labelledby="tagViewTitle" hidden>
+            <header class="tag-view-head">
+              <h1 id="tagViewTitle"></h1>
+              <span class="tally" id="tagViewTally"></span>
+              <button type="button" class="btn close" id="tagViewClose">Back to the entry</button>
+            </header>
+            <div id="tagViewList"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="context-menu" id="contextMenu" role="menu" hidden></div>
+
+    <div class="search-overlay" id="searchOverlay" hidden>
+      <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+        <h2 class="visually-hidden" id="searchTitle">Search your diary</h2>
+        <input class="search-input" id="searchInput" type="text" autocomplete="off" spellcheck="false" placeholder="Search your diary…" aria-label="Search your diary" role="combobox" aria-expanded="true" aria-controls="searchResults" aria-autocomplete="list" />
+        <div class="search-results" id="searchResults" role="listbox" aria-label="Search results"></div>
+        <div class="search-hint">
+          <kbd>↑</kbd><kbd>↓</kbd> move · <kbd>↵</kbd> open · <kbd>Esc</kbd> close
+          <button type="button" class="btn ghost show-all" id="searchShowAll" hidden>Read every match <kbd>⇧</kbd><kbd>↵</kbd></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-backdrop" id="settingsDialog" hidden>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <div class="dialog-head">
+          <h2 id="settingsTitle">Settings</h2>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close settings">×</button>
+        </div>
+        <div class="dialog-body">
+          <div class="field-row">
+            <div><div class="field-label" id="themeLabel">Theme</div><div class="field-hint">System follows your desktop's light or dark setting.</div></div>
+            <div class="seg-control" role="group" aria-labelledby="themeLabel" id="themeSeg">
+              <button type="button" data-theme="system">System</button>
+              <button type="button" data-theme="light">Light</button>
+              <button type="button" data-theme="dark">Dark</button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div><div class="field-label" id="bodyFontLabel">Writing font</div><div class="field-hint">Only changes how it looks here — the file on disk is the same either way.</div></div>
+            <div class="seg-control" role="group" aria-labelledby="bodyFontLabel" id="bodyFontSeg">
+              <button type="button" data-body-font="sans">Sans</button>
+              <button type="button" data-body-font="serif">Serif</button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div><label class="field-label" for="fontScale">Text size</label><div class="field-hint" id="fontScaleValue">100%</div></div>
+            <input type="range" id="fontScale" min="0.85" max="1.4" step="0.05" />
+          </div>
+
+          <div class="field-row">
+            <div><label class="field-label" for="titleStyle">How the date is written</label><div class="field-hint" id="titleStylePreview"></div></div>
+            <select id="titleStyle">
+              <option value="long">Friday, 18 September 2026</option>
+              <option value="us">Friday, September 18, 2026</option>
+              <option value="short">Fri 18 Sep 2026</option>
+              <option value="iso">2026-09-18</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div><label class="field-label" for="dayStartHour">A new day starts at</label><div class="field-hint">Writing after midnight but before this hour still counts as the day before.</div></div>
+            <select id="dayStartHour">
+              <option value="0">Midnight</option>
+              <option value="2">2 am</option>
+              <option value="3">3 am</option>
+              <option value="4">4 am</option>
+              <option value="5">5 am</option>
+              <option value="6">6 am</option>
+            </select>
+          </div>
+
+          <div class="field-row stacked">
+            <div>
+              <div class="field-label" id="headingsLabel">Sections in a new entry</div>
+              <div class="field-hint">These headings are written into each new day. Entries you have already written keep the headings they have.</div>
+              <div class="heading-rows" id="headingRows" aria-labelledby="headingsLabel"></div>
+              <button type="button" class="btn ghost heading-add" id="headingAdd"><span aria-hidden="true">＋</span> Add a section</button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div><label class="field-label" for="autosaveMs">Autosave delay</label><div class="field-hint" id="autosaveValue">700 ms</div></div>
+            <input type="range" id="autosaveMs" min="200" max="3000" step="100" />
+          </div>
+
+          <div class="field-row">
+            <div><label class="field-label" for="spellcheckToggle">Spell check</label><div class="field-hint">Underline misspelled words while you write.</div></div>
+            <input type="checkbox" id="spellcheckToggle" />
+          </div>
+
+          <div class="field-row">
+            <div>
+              <div class="field-label">Diary folder</div>
+              <div class="field-hint">Put this inside the folder your Nextcloud client syncs and the same diary opens on every device.</div>
+              <div class="path-value" id="settingsPath"></div>
+            </div>
+            <div class="field-control">
+              <button type="button" class="btn" id="settingsReveal">Open</button>
+              <button type="button" class="btn" id="settingsChoose">Change…</button>
+            </div>
+          </div>
+        </div>
+        <div class="dialog-foot">
+          <button type="button" class="btn primary" data-close-dialog>Done</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-backdrop" id="shortcutsDialog" hidden>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+        <div class="dialog-head">
+          <h2 id="shortcutsTitle">Keyboard shortcuts</h2>
+          <button type="button" class="dialog-close" data-close-dialog aria-label="Close shortcuts">×</button>
+        </div>
+        <div class="dialog-body">
+          <table class="shortcut-table" id="shortcutTable"></table>
+        </div>
+        <div class="dialog-foot">
+          <button type="button" class="btn primary" data-close-dialog>Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="src/entry.js"></script>
+    <script src="src/markdown.js"></script>
+    <script src="src/settings.js"></script>
+    <script src="src/store.js"></script>
+    <script src="src/ui/dialog.js"></script>
+    <script src="src/ui/search.js"></script>
+    <script src="src/renderer.js"></script>
+  </body>
+</html>

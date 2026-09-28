@@ -1,0 +1,12 @@
+{
+  "appId": "com.dailydiary.app",
+  "appName": "daily-diary",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": false
+  },
+  "plugins": {
+    "CapacitorHttp": { "enabled": false }
+  }
+}

@@ -1,0 +1,1740 @@
+/* ==========================================================================
+   daily-diary — application stylesheet
+
+   Contents
+     01  Fonts (bundled, no network)
+     02  Design tokens — light
+     03  Design tokens — dark
+     04  Reset & base
+     05  Scrollbars
+     06  Focus
+     07  App shell & sidebar
+     08  Calendar
+     09  Sidebar lists
+     10  Topbar
+     11  The page
+     12  Sections & the writing area
+     13  Toolbar
+     14  Buttons & form controls
+     15  Dialogs
+     16  Search palette
+     17  Context menu
+     18  Toast & notices
+     19  Boot and empty states
+     20  Utilities
+     21  Responsive
+     22  Reduced motion
+   ========================================================================== */
+
+
+/* ==========================================================================
+   01  FONTS
+   Bundled locally so the app never touches the network at runtime. All three
+   families are SIL Open Font License 1.1 — see src/fonts/OFL.txt.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url('fonts/dm-sans-var-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url('fonts/dm-sans-var-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/dm-mono-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/dm-mono-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/dm-mono-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/dm-mono-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/fraunces-var-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/fraunces-var-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/fraunces-var-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+/* ==========================================================================
+   02  DESIGN TOKENS — LIGHT (the complete palette lives here)
+   Warm paper and ink: the page is the colour of a notebook, the accent is the
+   blue-grey of fountain pen ink. Dark mode below redefines only these same
+   names; no colour is ever defined for the first time inside a media query.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- type ---------------------------------------------------------- */
+  --font-sans:  'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  --font-mono:  'DM Mono', ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* settings.js writes --font-scale onto document.documentElement.style */
+  --font-scale: 1;
+  /* swapped to --font-serif when the writing font is set to serif */
+  --font-body: var(--font-sans);
+
+  --fs-micro:   calc(9px  * var(--font-scale));
+  --fs-2xs:     calc(10px * var(--font-scale));
+  --fs-xs:      calc(11px * var(--font-scale));
+  --fs-sm:      calc(12px * var(--font-scale));
+  --fs-base:    calc(13px * var(--font-scale));
+  --fs-md:      calc(14px * var(--font-scale));
+  --fs-lg:      calc(15px * var(--font-scale));
+  --fs-xl:      calc(17px * var(--font-scale));
+  --fs-2xl:     calc(20px * var(--font-scale));
+  --fs-3xl:     calc(24px * var(--font-scale));
+  --fs-display: calc(32px * var(--font-scale));
+
+  /* --- surfaces ------------------------------------------------------ */
+  --paper:           #fffdf8;   /* the page you write on */
+  --bg:              #f4f1ea;   /* app ground */
+  --bg-raised:       #faf8f2;   /* topbar */
+  --bg-sunken:       #edeae1;   /* sidebar */
+  --bg-overlay:      #fffdf8;   /* dialogs, palette, context menu */
+  --surface-subtle:  #f1eee5;   /* quiet fills */
+  --surface-muted:   #f3f0e7;   /* kbd, table header */
+  --surface-hover:   #e6e2d7;
+  --scrim:           rgba(44, 41, 35, .34);
+
+  /* --- text ---------------------------------------------------------- */
+  --ink:        #2e2b26;   /* the date, dialog headings — strongest */
+  --ink-2:      #3f3b34;
+  --text:       #494339;   /* what you write */
+  --text-2:     #59534a;   /* sidebar rows, menu items */
+  --muted:      #6e6858;   /* secondary labels and buttons */
+  --faint:      #78715f;   /* counts, timestamps, eyebrows */
+  --on-accent:  #ffffff;
+
+  /* --- lines --------------------------------------------------------- */
+  --line:        #e5e0d3;  /* structural borders */
+  --line-soft:   #eeeae0;  /* hairlines inside a surface */
+  --line-strong: #cfc9b9;  /* soft chrome borders */
+  --line-control:#8b8474;  /* real form controls — 3:1 against --paper */
+  --divider:     #eae5da;
+
+  /* --- accent ramp --------------------------------------------------- */
+  --accent:        #55638f;  /* filled interactive surfaces */
+  --accent-hover:  #47547c;
+  --accent-strong: #3a4566;  /* toast, deepest ink */
+  --accent-ink:    #4a5783;  /* accent text on a tinted surface */
+  --accent-ink-2:  #525e88;  /* accent text on paper */
+  --accent-soft:   #dfe3f0;  /* selected row fill */
+  --accent-tint:   #e9ebf4;  /* chip fill */
+  --soft:          #f1f2f8;  /* lightest wash */
+  --accent-line:   #7a86ae;  /* today marker, active rules */
+  --accent-glow:   rgba(70, 82, 124, .16);
+  --ring:          #6572a0;  /* focus ring */
+
+  /* veils painted on top of a filled accent surface — light in light mode
+     because --on-accent is white, dark in dark mode because it is not */
+  --on-accent-veil:      rgba(255, 255, 255, .18);
+  --on-accent-veil-line: rgba(255, 255, 255, .28);
+
+  /* the toast keeps a deep ground in both themes, so its ink never flips */
+  --toast-bg:  #3a4566;
+  --toast-ink: #f3f4fa;
+  --toast-error-bg: #a8544a;   /* reads at 4.7:1 under --toast-ink either way */
+
+  /* --- status -------------------------------------------------------- */
+  --danger:      #a8544a;
+  --danger-ink:  #8b423a;
+  --danger-soft: #f7e7e3;
+  --positive:    #4e7d5c;
+  --warn:        #94683c;
+  --warn-soft:   #f7eedd;
+
+  /* --- what you write ------------------------------------------------ */
+  --mark-bg:       #f7e7b0;  /* highlighter */
+  --quote-line:    #c6c0ae;
+  --code-bg:       #f1eee5;
+  --code-ink:      #5d5647;
+
+  /* --- elevation ----------------------------------------------------- */
+  --shadow:      rgba(52, 46, 34, .16);
+  --shadow-page: 0 1px 2px rgba(52, 46, 34, .04), 0 12px 40px rgba(52, 46, 34, .05);
+  --shadow-pop:  0 20px 60px var(--shadow);
+  --shadow-menu: 0 10px 30px var(--shadow);
+  --shadow-btn:  0 2px 5px var(--accent-glow);
+
+  /* --- scrollbars ---------------------------------------------------- */
+  --scroll-thumb:       #d3ccbc;
+  --scroll-thumb-hover: #bdb5a2;
+
+  /* --- layering ------------------------------------------------------ */
+  --z-sticky:  40;
+  --z-dialog:  55;
+  --z-overlay: 60;
+  --z-menu:    70;
+  --z-toast:   80;
+}
+
+
+/* ==========================================================================
+   03  DESIGN TOKENS — DARK
+   Warm dark greys, not an inversion: the sidebar stays the most recessed
+   surface, the page stays the most raised one, and the ink blue is lifted so
+   it carries contrast against a dark ground. Both selectors are required so
+   an explicit choice always beats the OS preference, in both directions.
+   ========================================================================== */
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --paper:           #24231f;
+  --bg:              #1a1917;
+  --bg-raised:       #1f1e1b;
+  --bg-sunken:       #151413;
+  --bg-overlay:      #282723;
+  --surface-subtle:  #2b2a26;
+  --surface-muted:   #2e2d28;
+  --surface-hover:   #34332d;
+  --scrim:           rgba(10, 9, 8, .62);
+
+  --ink:        #ece9e1;
+  --ink-2:      #ded9d0;
+  --text:       #cdc8bd;
+  --text-2:     #b6b1a6;
+  --muted:      #9b968b;
+  --faint:      #827d72;
+  --on-accent:  #141726;
+
+  --line:        #36342e;
+  --line-soft:   #2c2b26;
+  --line-strong: #6d685d;
+  --line-control:#857f73;
+  --divider:     #302f29;
+
+  --accent:        #93a0cf;
+  --accent-hover:  #a6b1da;
+  --accent-strong: #3d4460;
+  --accent-ink:    #a3aedb;
+  --accent-ink-2:  #aeb8e0;
+  --accent-soft:   #363b52;
+  --accent-tint:   #2a2d3d;
+  --soft:          #262834;
+  --accent-line:   #93a0cf;
+  --accent-glow:   rgba(0, 0, 0, .45);
+  --ring:          #a3aedb;
+  --on-accent-veil:      rgba(0, 0, 0, .14);
+  --on-accent-veil-line: rgba(0, 0, 0, .22);
+
+  --danger:      #cf7b71;
+  --danger-ink:  #dd918a;
+  --danger-soft: #3b2724;
+  --positive:    #7fb392;
+  --warn:        #c3915d;
+  --warn-soft:   #37301f;
+
+  --mark-bg:       #574a22;
+  --quote-line:    #4b473e;
+  --code-bg:       #2b2a25;
+  --code-ink:      #bdb6a7;
+
+  --shadow:      rgba(0, 0, 0, .5);
+  --shadow-page: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 40px rgba(0, 0, 0, .25);
+
+  --scroll-thumb:       #403e37;
+  --scroll-thumb-hover: #4f4d44;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --paper:           #24231f;
+    --bg:              #1a1917;
+    --bg-raised:       #1f1e1b;
+    --bg-sunken:       #151413;
+    --bg-overlay:      #282723;
+    --surface-subtle:  #2b2a26;
+    --surface-muted:   #2e2d28;
+    --surface-hover:   #34332d;
+    --scrim:           rgba(10, 9, 8, .62);
+
+    --ink:        #ece9e1;
+    --ink-2:      #ded9d0;
+    --text:       #cdc8bd;
+    --text-2:     #b6b1a6;
+    --muted:      #9b968b;
+    --faint:      #827d72;
+    --on-accent:  #141726;
+
+    --line:        #36342e;
+    --line-soft:   #2c2b26;
+    --line-strong: #6d685d;
+    --line-control:#857f73;
+    --divider:     #302f29;
+
+    --accent:        #93a0cf;
+    --accent-hover:  #a6b1da;
+    --accent-strong: #3d4460;
+    --accent-ink:    #a3aedb;
+    --accent-ink-2:  #aeb8e0;
+    --accent-soft:   #363b52;
+    --accent-tint:   #2a2d3d;
+    --soft:          #262834;
+    --accent-line:   #93a0cf;
+    --accent-glow:   rgba(0, 0, 0, .45);
+    --ring:          #a3aedb;
+    --on-accent-veil:      rgba(0, 0, 0, .14);
+    --on-accent-veil-line: rgba(0, 0, 0, .22);
+
+    --danger:      #cf7b71;
+    --danger-ink:  #dd918a;
+    --danger-soft: #3b2724;
+    --positive:    #7fb392;
+    --warn:        #c3915d;
+    --warn-soft:   #37301f;
+
+    --mark-bg:       #574a22;
+    --quote-line:    #4b473e;
+    --code-bg:       #2b2a25;
+    --code-ink:      #bdb6a7;
+
+    --shadow:      rgba(0, 0, 0, .5);
+    --shadow-page: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 40px rgba(0, 0, 0, .25);
+
+    --scroll-thumb:       #403e37;
+    --scroll-thumb-hover: #4f4d44;
+  }
+}
+
+/* Writing font. The setting swaps one token and everything that reads it follows. */
+:root[data-body-font='serif'] { --font-body: var(--font-serif); }
+
+
+/* ==========================================================================
+   04  RESET & BASE
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3, h4, p { margin: 0; }
+::selection { background: var(--accent-soft); color: var(--ink); }
+
+
+/* ==========================================================================
+   05  SCROLLBARS
+   ========================================================================== */
+
+* { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); background-clip: content-box; }
+
+
+/* ==========================================================================
+   06  FOCUS
+   Visible for the keyboard, quiet for the mouse — except on real form
+   controls, where the ring is the only affordance there is.
+   ========================================================================== */
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+input[type='range']:focus, input[type='checkbox']:focus, select:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+
+/* ==========================================================================
+   07  APP SHELL & SIDEBAR
+   ========================================================================== */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  height: 100vh;
+  transition: grid-template-columns .18s ease;
+}
+.app-shell.no-sidebar { grid-template-columns: 0 minmax(0, 1fr); }
+.app-shell.no-sidebar .sidebar { opacity: 0; pointer-events: none; }
+
+.sidebar {
+  background: var(--bg-sunken);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  transition: opacity .14s ease;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 18px 12px;
+  font-weight: 600;
+  font-size: var(--fs-md);
+  color: var(--ink);
+  letter-spacing: -.01em;
+  flex: none;
+}
+.brand-mark {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--fs-sm);
+  flex: none;
+}
+
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 12px 10px;
+}
+
+.today-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  margin: 0 0 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  box-shadow: var(--shadow-btn);
+}
+.today-btn:hover { background: var(--accent-hover); }
+.today-btn kbd { margin-left: auto; }
+.today-btn kbd, .today-btn .kbd {
+  background: var(--on-accent-veil);
+  border: 1px solid var(--on-accent-veil-line);
+  color: inherit;
+}
+
+.section-label {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding: 2px 4px 7px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label .count { margin-left: auto; font-weight: 500; letter-spacing: .04em; }
+
+.sidebar-bottom {
+  flex: none;
+  padding: 8px 12px 12px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.plain-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  text-align: left;
+}
+.plain-btn:hover { background: var(--surface-hover); color: var(--ink-2); }
+.plain-btn span[aria-hidden] { width: 15px; text-align: center; color: var(--muted); }
+
+.storage {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 8px 2px;
+  font-size: var(--fs-2xs);
+  color: var(--faint);
+  min-width: 0;
+}
+.storage .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--positive);
+  flex: none;
+}
+.storage .path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+
+/* ==========================================================================
+   08  CALENDAR
+   A quiet month grid. Days you wrote on are marked; today is ringed; the day
+   you are reading is filled. Nothing else competes for attention.
+   ========================================================================== */
+
+.cal { margin-bottom: 18px; }
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 2px 6px;
+}
+.cal-title {
+  flex: 1;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--ink-2);
+  text-align: center;
+  padding: 3px 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+}
+.cal-title:hover { background: var(--surface-hover); }
+.cal-step {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-md);
+  line-height: 1;
+}
+.cal-step:hover { background: var(--surface-hover); color: var(--ink-2); }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.cal-dow {
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  text-align: center;
+  padding-bottom: 3px;
+}
+
+.cal-day {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+}
+.cal-day:hover { background: var(--surface-hover); color: var(--ink); }
+.cal-day.other { color: var(--faint); opacity: .55; }
+.cal-day.future { color: var(--faint); opacity: .4; }
+/* A written day carries a dot under the number; a written-on day you are not reading
+   also gets a faint fill, so a busy month reads as texture rather than as a list. */
+.cal-day.has-entry { color: var(--ink); font-weight: 500; }
+.cal-day.has-entry::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-line);
+}
+.cal-day.today { border-color: var(--accent-line); }
+.cal-day.current,
+.cal-day.current:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+.cal-day.current::after { background: var(--on-accent); opacity: .8; }
+
+.cal-foot {
+  padding: 8px 4px 0;
+  font-size: var(--fs-2xs);
+  color: var(--faint);
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.cal-foot b { color: var(--muted); font-weight: 600; }
+
+
+/* ==========================================================================
+   09  SIDEBAR LISTS  (recent entries, on this day, tags)
+   ========================================================================== */
+
+.entry-list { display: flex; flex-direction: column; gap: 1px; margin-bottom: 18px; }
+
+.entry-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  text-align: left;
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  min-width: 0;
+}
+.entry-row:hover { background: var(--surface-hover); color: var(--ink-2); }
+.entry-row.current { background: var(--accent-soft); color: var(--accent-ink); font-weight: 500; }
+.entry-row .when { flex: none; font-variant-numeric: tabular-nums; }
+.entry-row .peek {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--faint);
+  font-size: var(--fs-sm);
+}
+.entry-row.current .peek { color: var(--accent-ink); opacity: .8; }
+/* Tags sit at the right-hand end of the row, which is where they are wanted and which works
+   because an entry normally carries one. The pair of floors below are what stop one long tag
+   from eating the preview: the tag shrinks first, and the preview never goes below ~9
+   characters, which is enough to still be a preview. */
+.entry-row .row-tags {
+  flex: 0 0 auto;      /* never shrinks — a tag squeezed to "w…" is not a tag */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.entry-row .row-tag {
+  font-size: var(--fs-2xs);
+  line-height: 1.5;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 84px;
+}
+.entry-row .row-more {
+  font-size: var(--fs-2xs);
+  color: var(--faint);
+  white-space: nowrap;
+}
+.entry-row.current .row-tag { background: var(--on-accent-veil); color: var(--accent-ink); }
+
+/* The × that drops a tag filter and puts the full list back. */
+.filter-clear {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-md);
+  line-height: 1;
+  padding: 0;
+}
+.filter-clear:hover { background: var(--surface-hover); color: var(--ink-2); }
+.filter-clear[hidden] { display: none; }
+
+/* ---- the tag menu under "on this day" ---- */
+
+.tag-list { display: flex; flex-direction: column; gap: 1px; margin-bottom: 18px; }
+
+.tag-row-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  text-align: left;
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  min-width: 0;
+}
+.tag-row-item:hover { background: var(--surface-hover); color: var(--ink-2); }
+.tag-row-item.on { background: var(--accent-soft); color: var(--accent-ink); font-weight: 500; }
+.tag-row-item .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-line);
+  flex: none;
+}
+.tag-row-item .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag-row-item .tally { flex: none; font-size: var(--fs-2xs); color: var(--faint); font-variant-numeric: tabular-nums; }
+.tag-row-item.on .tally { color: var(--accent-ink); opacity: .75; }
+
+.list-empty {
+  padding: 4px 8px 10px;
+  font-size: var(--fs-sm);
+  color: var(--faint);
+  line-height: 1.5;
+}
+
+
+/* ==========================================================================
+   10  TOPBAR
+   ========================================================================== */
+
+.main-area {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
+}
+
+.topbar {
+  flex: none;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--line);
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-lg);
+  line-height: 1;
+  flex: none;
+}
+.icon-btn:hover { background: var(--surface-hover); color: var(--ink-2); }
+.icon-btn[disabled] { opacity: .35; pointer-events: none; }
+
+.day-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 2px;
+}
+
+.day-label {
+  font-size: var(--fs-base);
+  font-weight: 500;
+  color: var(--ink-2);
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.day-label .relative { color: var(--faint); font-weight: 400; }
+
+.saved {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  color: var(--faint);
+  margin-left: 8px;
+}
+.saved i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--positive);
+  display: block;
+  transition: background .2s ease;
+}
+.saved.dirty i { background: var(--warn); }
+/* Held: there is a second version of this day and nothing is written until you pick one. */
+.saved.held i { background: var(--warn); }
+.saved.held { color: var(--warn); }
+.saved.failed i { background: var(--danger); }
+
+.top-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.folder-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+.folder-btn:hover { background: var(--surface-hover); color: var(--ink-2); }
+
+
+/* ==========================================================================
+   11  THE PAGE
+   ========================================================================== */
+
+.workspace {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.page {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 40px 36px 45vh;   /* the deep tail keeps the last line off the bottom edge */
+}
+
+.page-head { margin-bottom: 30px; }
+
+.eyebrow {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: var(--accent-ink-2);
+  margin-bottom: 8px;
+}
+
+.entry-date {
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -.012em;
+  color: var(--ink);
+}
+
+.entry-meta {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: var(--fs-sm);
+  color: var(--faint);
+}
+.entry-meta .dot { color: var(--line-strong); }
+
+/* The tags on the open entry, under the date. Chips you can read at a glance and remove
+   with one click, plus one quiet control for adding another. */
+.tag-row {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 4px 3px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  max-width: 100%;
+}
+.tag-chip .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tag-chip .drop {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  opacity: .5;
+  font-size: var(--fs-sm);
+  line-height: 1;
+  padding: 0;
+  flex: none;
+}
+.tag-chip .drop:hover { opacity: 1; background: var(--on-accent-veil); }
+
+.tag-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 11px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+.tag-add:hover { border-style: solid; background: var(--surface-subtle); color: var(--ink-2); }
+
+/* The add-a-tag field, which replaces the button in place so the row does not jump. */
+.tag-input {
+  padding: 3px 11px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  width: 15ch;
+}
+
+/* Suggestions from the tags already in the diary, so they stay consistent rather than
+   sprouting three spellings of the same person. */
+.tag-suggest {
+  position: absolute;
+  z-index: var(--z-menu);
+  min-width: 170px;
+  max-height: 210px;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: var(--shadow-menu);
+}
+.tag-suggest[hidden] { display: none; }
+.tag-suggest button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  text-align: left;
+}
+.tag-suggest button:hover, .tag-suggest button.on { background: var(--surface-hover); color: var(--ink-2); }
+.tag-suggest .tally { margin-left: auto; font-size: var(--fs-2xs); color: var(--faint); }
+
+
+/* ==========================================================================
+   12  SECTIONS & THE WRITING AREA
+   Each heading in the file is its own editor. They look like one continuous
+   page, but the caret never crosses a heading, so the structure the file has
+   on disk cannot be typed away by accident.
+   ========================================================================== */
+
+.sections { display: flex; flex-direction: column; }
+
+.section {
+  padding-top: 22px;
+  scroll-margin-top: 70px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* Scoped through .section so it outranks the generic `input[type='text']` rule further
+   down — a heading is a line of text you can retype, not a form field. */
+.section .section-title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent-ink-2);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  padding: 3px 5px;
+  margin-left: -5px;
+  font-family: var(--font-sans);
+}
+.section .section-title:hover { background: var(--surface-subtle); }
+.section .section-title:focus { background: var(--paper); border-color: var(--line-strong); }
+
+.section-tools { display: flex; gap: 2px; opacity: 0; transition: opacity .12s ease; }
+.section:hover .section-tools,
+.section:focus-within .section-tools { opacity: 1; }
+.section-tools .icon-btn { width: 24px; height: 24px; font-size: var(--fs-base); }
+
+.editor {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: var(--shadow-page);
+  padding: 16px 20px;
+  min-height: 92px;
+  font-family: var(--font-body);
+  font-size: var(--fs-lg);
+  line-height: 1.75;
+  color: var(--text);
+  outline: none;
+  transition: border-color .14s ease;
+  overflow-wrap: break-word;
+}
+.editor:focus { border-color: var(--accent-line); }
+.editor[data-empty='true']::before {
+  content: attr(data-placeholder);
+  color: var(--faint);
+  opacity: .72;
+  pointer-events: none;
+  display: block;
+}
+
+/* What you can write. Kept deliberately short: a diary is prose, and a page of
+   formatting controls is the opposite of a calm place to write. */
+.editor p { margin: 0 0 .85em; }
+.editor p:last-child { margin-bottom: 0; }
+.editor strong, .editor b { font-weight: 600; color: var(--ink-2); }
+.editor em, .editor i { font-style: italic; }
+.editor u { text-decoration-color: var(--accent-line); text-underline-offset: 2px; }
+.editor mark { background: var(--mark-bg); color: inherit; padding: 0 2px; border-radius: 3px; }
+.editor ul, .editor ol { margin: 0 0 .85em; padding-left: 1.4em; }
+.editor li { margin-bottom: .22em; }
+.editor li::marker { color: var(--muted); }
+.editor blockquote {
+  margin: 0 0 .85em;
+  padding-left: 14px;
+  border-left: 2px solid var(--quote-line);
+  color: var(--text-2);
+  font-style: italic;
+}
+.editor code {
+  font-family: var(--font-mono);
+  font-size: .9em;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.editor pre {
+  margin: 0 0 .85em;
+  padding: 11px 13px;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+.editor pre code { background: none; padding: 0; }
+.editor a { color: var(--accent-ink-2); text-underline-offset: 2px; }
+.editor h1, .editor h2, .editor h3 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--ink);
+  margin: 1em 0 .4em;
+}
+.editor hr { border: 0; border-top: 1px solid var(--line); margin: 1.2em 0; }
+/* Photos. Block-level with room around them, because in a diary a picture is usually its
+   own thought rather than something inline in a sentence. */
+.editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 4px 0;
+  cursor: pointer;
+}
+.editor img.selected {
+  outline: 2px solid var(--accent-line);
+  outline-offset: 2px;
+}
+/* While photos are being dragged over an editor. */
+.editor.drop-target {
+  border-color: var(--accent-line);
+  background: var(--soft);
+}
+
+.add-section {
+  align-self: flex-start;
+  margin-top: 22px;
+  padding: 7px 13px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+.add-section:hover { border-style: solid; background: var(--surface-subtle); color: var(--ink-2); }
+
+
+/* ---- the tag view: every entry carrying one tag, in the main panel ---- */
+
+.tag-view { max-width: 740px; margin: 0 auto; padding: 40px 36px 20vh; }
+.tag-view[hidden] { display: none; }
+
+.tag-view-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 26px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.tag-view-head h1 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+.tag-view-head .tally { color: var(--faint); font-size: var(--fs-base); }
+.tag-view-head .close { margin-left: auto; }
+
+.tag-hit {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: var(--shadow-page);
+  color: inherit;
+}
+.tag-hit:hover { border-color: var(--accent-line); }
+.tag-hit .hit-head { display: flex; align-items: baseline; gap: 12px; }
+.tag-hit .hit-count {
+  margin-left: auto;
+  flex: none;
+  font-size: var(--fs-2xs);
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.tag-hit .hit-date {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--ink);
+}
+.tag-hit .hit-body {
+  margin-top: 5px;
+  font-size: var(--fs-base);
+  color: var(--text-2);
+  line-height: 1.6;
+}
+/* A tag hit shows the opening of the day as a teaser, so it is clamped. A search hit shows
+   the paragraphs that matched, which must not be cut off half way through a highlight. */
+.tag-hit .hit-body:not(:has(.hit-passage)) {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* One matching paragraph. Several per entry, separated by a gap mark, so it is obvious
+   that what is shown is not the whole day. */
+.tag-hit .hit-passage { margin: 0; }
+.tag-hit .hit-passage.quiet { color: var(--faint); }
+.tag-hit .hit-body mark {
+  background: var(--mark-bg);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: 500;
+}
+.tag-hit .hit-gap {
+  color: var(--line-strong);
+  line-height: 1;
+  margin: 4px 0;
+  letter-spacing: .1em;
+}
+
+.tag-hit .hit-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+.tag-hit .hit-tag {
+  font-size: var(--fs-2xs);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+}
+.tag-hit .hit-tag.is-this { background: var(--accent); color: var(--on-accent); }
+
+/* ==========================================================================
+   13  TOOLBAR
+   Sticks under the topbar and acts on whichever section has the caret.
+   ========================================================================== */
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s ease;
+}
+.toolbar.stuck { border-bottom-color: var(--line); }
+/* `display: flex` above outranks the hidden attribute, so hiding it has to be said. */
+.toolbar[hidden] { display: none; }
+.toolbar button {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-base);
+  line-height: 1;
+}
+.toolbar button:hover { background: var(--surface-hover); color: var(--ink-2); }
+.toolbar button.on { background: var(--accent-soft); color: var(--accent-ink); }
+.toolbar button.labelled { padding: 0 10px; font-size: var(--fs-sm); }
+.toolbar button[disabled] { opacity: .35; pointer-events: none; }
+.toolbar .sep { width: 1px; height: 17px; background: var(--line); margin: 0 5px; flex: none; }
+.toolbar .fill { flex: 1; }
+.word-count {
+  font-size: var(--fs-2xs);
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  padding-right: 4px;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   14  BUTTONS & FORM CONTROLS
+   ========================================================================== */
+
+.btn {
+  padding: 8px 15px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  font-weight: 500;
+}
+.btn:hover { background: var(--surface-hover); color: var(--ink-2); }
+.btn.primary { background: var(--accent); border-color: transparent; color: var(--on-accent); box-shadow: var(--shadow-btn); }
+.btn.primary:hover { background: var(--accent-hover); }
+.btn.danger { background: var(--danger); border-color: transparent; color: #fff; }
+.btn.danger:hover { filter: brightness(.94); }
+.btn.ghost { background: none; border-color: transparent; color: var(--muted); }
+.btn.ghost:hover { background: var(--surface-hover); }
+
+kbd, .kbd {
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs);
+  font-weight: 500;
+  padding: 2px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: var(--surface-muted);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+input[type='text'], input[type='number'], select {
+  padding: 7px 10px;
+  border: 1px solid var(--line-control);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: var(--fs-base);
+}
+input[type='range'] { accent-color: var(--accent); width: 170px; }
+input[type='checkbox'] { accent-color: var(--accent); width: 16px; height: 16px; }
+
+.seg-control {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface-subtle);
+  gap: 2px;
+}
+.seg-control button {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.seg-control button:hover { color: var(--ink-2); }
+.seg-control button.on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px var(--shadow); }
+
+
+/* ==========================================================================
+   15  DIALOGS
+   ========================================================================== */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  background: var(--scrim);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+.dialog-backdrop[hidden] { display: none; }
+
+.dialog {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+}
+.dialog.confirm { width: min(440px, 100%); }
+
+.dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.dialog-head h2 {
+  flex: 1;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--ink);
+  font-family: var(--font-serif);
+}
+.dialog-close {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  font-size: var(--fs-xl);
+  line-height: 1;
+}
+.dialog-close:hover { background: var(--surface-hover); color: var(--ink-2); }
+
+.dialog-body {
+  padding: 6px 18px 14px;
+  overflow-y: auto;
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+}
+.dialog-body p { margin: 10px 0; }
+
+.dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.field-row:last-child { border-bottom: 0; }
+/* A row whose control is a whole block of its own rather than something sitting beside
+   the label — the section-heading editor. */
+.field-row.stacked > div:first-child { flex: 1; }
+.field-row > div:first-child { flex: 1; min-width: 0; }
+.field-label { font-size: var(--fs-base); font-weight: 500; color: var(--ink-2); }
+.field-hint { font-size: var(--fs-sm); color: var(--faint); margin-top: 2px; line-height: 1.45; }
+.field-control { display: flex; align-items: center; gap: 8px; }
+
+.prompt-input, .dialog-body input[type='text'] { width: 100%; }
+.dialog.prompt .field-row { flex-direction: column; align-items: stretch; gap: 6px; border-bottom: 0; }
+
+.path-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  word-break: break-all;
+  margin-top: 3px;
+}
+
+/* The heading editor inside Settings */
+.heading-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.heading-row { display: flex; align-items: center; gap: 6px; }
+.heading-row input { flex: 1; }
+.heading-row .icon-btn { border: 1px solid var(--line-strong); border-radius: 7px; }
+.heading-add { align-self: flex-start; }
+
+.shortcut-table { width: 100%; border-collapse: collapse; font-size: var(--fs-base); }
+.shortcut-table td { padding: 6px 0; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+.shortcut-table td:last-child { text-align: right; white-space: nowrap; }
+.shortcut-table tr:last-child td { border-bottom: 0; }
+
+
+/* ==========================================================================
+   16  SEARCH PALETTE
+   ========================================================================== */
+
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--scrim);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 11vh 24px 24px;
+}
+.search-overlay[hidden] { display: none; }
+
+.search-panel {
+  width: min(620px, 100%);
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 72vh;
+}
+.search-input {
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: none;
+  padding: 15px 18px;
+  font-size: var(--fs-xl);
+  color: var(--ink);
+}
+.search-input::placeholder { color: var(--faint); }
+.search-results { overflow-y: auto; padding: 6px; flex: 1; }
+
+.search-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: inherit;
+}
+.search-row:hover, .search-row.on { background: var(--surface-hover); }
+.search-row .row-date { font-size: var(--fs-base); font-weight: 500; color: var(--ink-2); }
+.search-row .row-snippet {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin-top: 2px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.search-row mark { background: var(--mark-bg); color: var(--ink); border-radius: 3px; padding: 0 1px; }
+.search-row .row-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.search-row .row-tag {
+  font-size: var(--fs-2xs);
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+}
+
+.search-hint .show-all { margin-left: auto; padding: 3px 9px; font-size: var(--fs-2xs); }
+.search-hint .show-all[hidden] { display: none; }
+.search-hint .show-all kbd { margin-left: 5px; }
+
+.search-hint {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding: 9px 16px;
+  border-top: 1px solid var(--line-soft);
+  font-size: var(--fs-2xs);
+  color: var(--faint);
+}
+.search-empty { padding: 26px 18px; text-align: center; color: var(--faint); font-size: var(--fs-base); }
+
+
+/* ==========================================================================
+   17  CONTEXT MENU
+   ========================================================================== */
+
+.context-menu {
+  position: fixed;
+  z-index: var(--z-menu);
+  min-width: 190px;
+  padding: 5px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-menu);
+}
+.context-menu[hidden] { display: none; }
+.context-menu button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-base);
+  text-align: left;
+}
+.context-menu button:hover { background: var(--surface-hover); color: var(--ink-2); }
+.context-menu button.suggestion { font-weight: 500; color: var(--ink-2); }
+.context-menu hr { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; }
+
+
+/* ==========================================================================
+   18  TOAST & NOTICES
+   ========================================================================== */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 14px);
+  z-index: var(--z-toast);
+  padding: 10px 17px;
+  border-radius: 999px;
+  background: var(--toast-bg);
+  color: var(--toast-ink);
+  font-size: var(--fs-base);
+  box-shadow: var(--shadow-pop);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.error { background: var(--toast-error-bg); }
+
+/* Shown when the same day changed on another device while you were typing. */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 11px 14px;
+  border: 1px solid var(--warn);
+  border-radius: 10px;
+  background: var(--warn-soft);
+  color: var(--ink-2);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+}
+.notice[hidden] { display: none; }
+.notice .notice-text { flex: 1; min-width: 0; }
+.notice .notice-actions { display: flex; gap: 6px; flex: none; }
+.notice .btn { padding: 5px 11px; font-size: var(--fs-sm); }
+
+
+/* ==========================================================================
+   19  BOOT AND EMPTY STATES
+   ========================================================================== */
+
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  background: var(--bg);
+  padding: 24px;
+}
+.boot-screen[hidden] { display: none; }
+.boot-screen .empty-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+  font-size: var(--fs-2xl);
+  margin-bottom: 4px;
+}
+.boot-screen h2 { font-family: var(--font-serif); font-size: var(--fs-2xl); font-weight: 600; color: var(--ink); }
+.boot-screen p { color: var(--muted); font-size: var(--fs-base); max-width: 44ch; line-height: 1.6; }
+.boot-screen .field-control { margin-top: 10px; }
+
+
+/* ==========================================================================
+   20  UTILITIES
+   ========================================================================== */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ==========================================================================
+   21  RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 880px) {
+  .app-shell { grid-template-columns: 228px minmax(0, 1fr); }
+  .page { padding: 32px 22px 45vh; }
+}
+
+@media (max-width: 680px) {
+  .app-shell { grid-template-columns: 0 minmax(0, 1fr); }
+  .app-shell .sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 262px; z-index: var(--z-sticky); box-shadow: var(--shadow-menu); }
+  /* With the sidebar out of the flow, auto-placement would put the page in the 0px column. */
+  .app-shell .main-area { grid-column: 2; }
+  .app-shell.no-sidebar .sidebar { transform: translateX(-100%); }
+  .folder-btn span:not([aria-hidden]) { display: none; }
+}
+
+
+/* ==========================================================================
+   22  REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,91 @@
+daily-diary — End User License
+
+Copyright (c) 2026 ernest-it. All rights reserved.
+
+This software is proprietary. It is provided for use only. It is not open source,
+and no rights are granted except those written below.
+
+
+1. PERMISSION GRANTED
+
+You may, free of charge:
+
+  a. Download, install, and run this software on any number of devices you own
+     or control, for personal, educational, or internal business purposes.
+
+  b. Create, edit, and keep your own notes and documents with it. Everything you
+     write using this software is yours. This license claims no rights of any
+     kind over your content.
+
+  c. Make copies of the unmodified software for backup purposes.
+
+
+2. PERMISSION NOT GRANTED
+
+You may not:
+
+  a. Sell, rent, lease, sublicense, or otherwise charge any fee for this
+     software, or include it in anything you charge for.
+
+  b. Modify, adapt, translate, or create derivative works from this software.
+
+  c. Redistribute this software, in whole or in part, whether modified or not,
+     and whether or not for a fee.
+
+  d. Reverse engineer, decompile, or disassemble the compiled software, except
+     to the extent this restriction is prohibited by applicable law.
+
+  e. Remove, obscure, or alter any copyright, trademark, or license notice.
+
+  f. Use the name "daily-diary" or the author's name to endorse or promote any
+     product without prior written permission.
+
+
+3. THIRD-PARTY COMPONENTS
+
+This software is built with, and distributes, components owned by others. Those
+components are governed by their own licenses, not by this one, and nothing in
+Section 2 restricts any right their licenses grant you:
+
+  - Electron, Node.js, Chromium, and the npm packages listed in package.json,
+    under their respective licenses (MIT, BSD, and others). The packaged
+    application includes their license texts.
+
+  - The DM Sans, DM Mono, and Fraunces typefaces in src/fonts/, under the SIL
+    Open Font License 1.1. The full text is in src/fonts/OFL.txt and must
+    accompany those font files wherever they go.
+
+
+4. RESERVATION OF RIGHTS
+
+All rights not expressly granted in Section 1 are reserved by the copyright
+holder. Nothing in this license transfers ownership of the software.
+
+
+5. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+
+6. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+This software stores your notes as files on your own disk. You are responsible
+for backing them up. The author is not liable for any loss of data.
+
+
+7. TERMINATION
+
+This license terminates automatically if you breach any of its terms. On
+termination you must stop using the software and delete all copies. Your own
+notes and documents remain yours.
+
+
+For permissions beyond the scope of this license, contact the author through the
+project's GitHub page.

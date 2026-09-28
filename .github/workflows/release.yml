@@ -1,0 +1,237 @@
+# daily-diary release.
+#
+# Why a matrix rather than one host: electron-builder can only produce Linux targets on
+# Linux — deb needs dpkg-deb, rpm needs rpmbuild, AppImage needs a Linux runtime — and the
+# NSIS installer is built on real Windows here rather than under Wine. Neither host can
+# produce the other's installers, so both run.
+#
+# Why each job uploads to the release itself, rather than actions/upload-artifact and a
+# collecting job: Actions artifact storage is an account-wide quota, and a pair of ~100 MB
+# Electron builds fills it quickly — a full quota then fails the upload *after* a perfectly
+# good build. Release assets do not count against it, so the installers go straight there
+# and the artifact step disappears along with the quota problem.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # A draft first, so a half-finished release is never visible and both build jobs have
+  # something to upload into without racing to create it.
+  prepare:
+    name: draft the release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create the draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "release already exists; reusing it"
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "daily-diary $GITHUB_REF_NAME" \
+              --notes-file .github/RELEASE_NOTES.md \
+              --verify-tag \
+              --draft
+          fi
+
+  build:
+    name: ${{ matrix.os }}
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      # `npm install`, not `npm ci`: the committed lockfile is regenerated whenever the
+      # Electron major is bumped, and a release must not fail on a lockfile that lags.
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Syntax check
+        run: npm run check
+
+      - name: Verify generated icons
+        run: npm run icons:verify
+
+      - name: Test
+        run: npm test
+
+      - name: Install Linux packaging tools
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y rpm fakeroot
+
+      # electron-builder unpacks a toolchain containing macOS symlinks. Creating symlinks on
+      # Windows needs Developer Mode or elevation; without it extraction fails and no
+      # installer is produced. Runners are administrators, so enable it before packaging.
+      - name: Enable Developer Mode (symlink support)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock'
+          New-Item -Path $key -Force | Out-Null
+          Set-ItemProperty -Path $key -Name AllowDevelopmentWithoutDevLicense -Value 1 -Type DWord
+          Write-Host "Developer Mode enabled for symlink creation"
+
+      - name: Package (Windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx --no-install electron-builder --win nsis portable --publish never
+
+      - name: Package (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: npx --no-install electron-builder --linux AppImage deb rpm --publish never
+
+      # Install the .deb exactly as a user would and confirm the app actually starts.
+      # Packaging succeeding says nothing about whether the binary runs: Electron needs a
+      # correctly set up sandbox helper, and recent Ubuntu restricts unprivileged user
+      # namespaces, either of which crashes the app on launch while the build stays green.
+      - name: Smoke test the Linux package
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          set +e
+          sudo apt-get install --no-install-recommends -y xvfb
+          sudo dpkg -i dist/*.deb || sudo apt-get -f install -y
+
+          echo "::group::installed files"
+          dpkg -L daily-diary | grep -E 'chrome-sandbox|/bin/|\.desktop' | head
+          ls -l /opt/daily-diary/chrome-sandbox 2>/dev/null || echo "no chrome-sandbox at /opt/daily-diary"
+          echo "::endgroup::"
+
+          echo "::group::launch as shipped (no flags)"
+          xvfb-run -a --server-args="-screen 0 1280x800x24" \
+            timeout 25 daily-diary > plain.log 2>&1
+          code=$?
+          echo "exit code: $code"
+          tail -30 plain.log
+          echo "::endgroup::"
+
+          # 124 is `timeout` killing a healthy app that was still running. Anything else
+          # means it exited on its own, which for a GUI app launched here means a crash.
+          if [ "$code" -ne 124 ]; then
+            echo "::error::daily-diary exited with $code instead of running until the timeout."
+            grep -iE 'FATAL|sandbox|namespace|error while loading' plain.log | head -5
+            exit 1
+          fi
+          echo "app stayed running for the full timeout — launch is healthy"
+
+      # bash on the Windows runner too, so one glob works on both. .blockmap files are
+      # electron-builder's auto-update bookkeeping and are not something to hand a person.
+      - name: Attach the installers to the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(dist/*.exe dist/*.AppImage dist/*.deb dist/*.rpm)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::no installers were produced"
+            exit 1
+          fi
+          ls -lh "${files[@]}"
+          gh release upload "$GITHUB_REF_NAME" "${files[@]}" --clobber
+
+  # The Android app, from the same page and the same tag. Signed with the release key held
+  # in the repository's secrets — every APK must carry the same signature, or Android will
+  # refuse to install it over the previous one. A missing key fails the job loudly rather
+  # than shipping something that cannot be updated.
+  android:
+    name: android
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      # The Capacitor plugins compile against a Java 21 toolchain.
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        working-directory: mobile
+        run: npm ci --no-audit --no-fund
+
+      - name: Test the sync
+        run: node --test test/mobile-sync.test.js
+
+      - name: Unpack the signing key
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "::error::The ANDROID_KEYSTORE_BASE64 secret is not set — see mobile/SIGNING.md"
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - name: Build the APK
+        working-directory: mobile
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: npm run apk:release
+
+      # An unsigned APK builds without complaint and then will not install, so check.
+      - name: Verify the signature and attach the APK to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          out="daily-diary-${version}-android.apk"
+          cp mobile/android/app/build/outputs/apk/release/app-release.apk "$out"
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs "$out"
+          rm -f "$RUNNER_TEMP/release.jks"
+          ls -lh "$out"
+          gh release upload "$GITHUB_REF_NAME" "$out" --clobber
+
+  publish:
+    name: publish
+    needs: [build, android]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Take the release out of draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release edit "$GITHUB_REF_NAME" --draft=false
+          gh release view "$GITHUB_REF_NAME" --json assets --jq '.assets[] | "\(.name)  \(.size)"'

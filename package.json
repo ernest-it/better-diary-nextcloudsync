@@ -1,0 +1,136 @@
+{
+  "name": "daily-diary",
+  "version": "0.5.0",
+  "description": "A daily diary that writes plain Markdown into your Nextcloud folder",
+  "main": "src/main.js",
+  "author": "ernest-it <161004105+ernest-it@users.noreply.github.com>",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "electron .",
+    "check": "node build/check.js",
+    "test": "node --test",
+    "icons": "node build/make-icons.js",
+    "icons:verify": "node build/make-icons.js --verify",
+    "screenshots": "electron build/screenshots.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win nsis portable",
+    "dist:linux": "electron-builder --linux AppImage deb rpm",
+    "dist:mac": "electron-builder --mac dmg zip"
+  },
+  "build": {
+    "appId": "com.dailydiary.app",
+    "productName": "daily-diary",
+    "copyright": "Copyright © 2026 daily-diary",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "index.html",
+      "!**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "daily-diary",
+      "uninstallDisplayName": "daily-diary ${version}",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Office",
+      "synopsis": "A daily diary that syncs through Nextcloud",
+      "description": "daily-diary keeps one Markdown file per day in a folder you own — point it at the folder your Nextcloud client syncs and the same diary opens on every device. Headings and the date are filled in for you.",
+      "maintainer": "ernest-it <161004105+ernest-it@users.noreply.github.com>",
+      "desktop": {
+        "Name": "daily-diary",
+        "GenericName": "Diary",
+        "Comment": "A daily diary that syncs through Nextcloud",
+        "Categories": "Office;TextEditor;Utility;",
+        "Keywords": "diary;journal;markdown;nextcloud;",
+        "StartupWMClass": "daily-diary"
+      },
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ]
+    },
+    "deb": {
+      "priority": "optional",
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libsecret-1-0"
+      ],
+      "afterInstall": "build/linux-after-install.sh"
+    },
+    "rpm": {
+      "depends": [
+        "gtk3",
+        "libnotify",
+        "nss",
+        "libXScrnSaver",
+        "libXtst",
+        "xdg-utils",
+        "at-spi2-core",
+        "libsecret"
+      ],
+      "afterInstall": "build/linux-after-install.sh"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true
+}
