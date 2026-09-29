@@ -17,7 +17,9 @@ const diarySettings = (() => {
     headings: ['How the day went', 'Notes', 'Tomorrow'],
     titleStyle: 'long',
     dayStartHour: 4,
-    bodyFont: 'sans'
+    bodyFont: 'sans',
+    reminderEnabled: false,
+    reminderTime: diaryReminder.DEFAULT_TIME
   };
 
   const listeners = new Set();
@@ -55,6 +57,8 @@ const diarySettings = (() => {
     if ('diaryPath' in patch) next.diaryPath = typeof patch.diaryPath === 'string' && patch.diaryPath ? patch.diaryPath : null;
     if ('spellcheck' in patch) next.spellcheck = Boolean(patch.spellcheck);
     if ('sidebarVisible' in patch) next.sidebarVisible = Boolean(patch.sidebarVisible);
+    if ('reminderEnabled' in patch) next.reminderEnabled = Boolean(patch.reminderEnabled);
+    if ('reminderTime' in patch) next.reminderTime = diaryReminder.normaliseTime(patch.reminderTime, base.reminderTime);
     if ('headings' in patch) {
       const list = headingList(patch.headings).slice(0, 12);
       next.headings = list.length ? list : base.headings.slice();

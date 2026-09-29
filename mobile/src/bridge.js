@@ -12,7 +12,7 @@
 
   const cap = window.Capacitor;
   const plugins = (cap && cap.Plugins) || {};
-  const { Filesystem, App, Share, Nextcloud } = plugins;
+  const { Filesystem, App, Share, Nextcloud, LocalNotifications } = plugins;
 
   const DIR = 'DATA';
   const LOCAL = 'diary';
@@ -31,7 +31,9 @@
     headings: ['How the day went', 'Notes', 'Tomorrow'],
     titleStyle: 'long',
     dayStartHour: 4,
-    bodyFont: 'sans'
+    bodyFont: 'sans',
+    reminderEnabled: false,
+    reminderTime: window.diaryReminder.DEFAULT_TIME
   };
 
   const IMAGE_TYPES = {
@@ -182,7 +184,11 @@
         runSetup({ mode: 'reauth' }).finally(() => { reauthOpen = false; });
       }
     }
-    if (result.changed && result.changed.length) fanOut(listeners.changed);
+    if (result.changed && result.changed.length) {
+      fanOut(listeners.changed);
+      /* A day written on another device should silence tonight's reminder here too. */
+      scheduleReminders();
+    }
     return result;
   }
 
@@ -269,6 +275,66 @@
     }
     startTicking();
     readyResolve();
+    scheduleReminders();
+  }
+
+  /* ---------------------------------------------------------------- bedtime reminder
+
+     Android shows these even when the app is not running, so they are handed to the system
+     in advance: one notification per evening for the next month, leaving out any day already
+     written. Reschedules on launch, on saving, after a sync brings in a day, and when the
+     setting changes — so it goes quiet the moment the entry exists, and keeps going for a
+     month even if the app is never opened in between. */
+
+  const REMINDER_IDS = 7000;
+  const REMINDER_DAYS = 30;
+  const REMINDER_CHANNEL = 'bedtime-reminder';
+  let reminderQueue = Promise.resolve();
+
+  function scheduleReminders() {
+    reminderQueue = reminderQueue.then(rescheduleReminders).catch(() => {});
+    return reminderQueue;
+  }
+
+  async function rescheduleReminders() {
+    if (!LocalNotifications) return;
+    const { notifications: pending } = await LocalNotifications.getPending();
+    const ours = pending.filter(item => item.id >= REMINDER_IDS && item.id < REMINDER_IDS + REMINDER_DAYS);
+    if (ours.length) await LocalNotifications.cancel({ notifications: ours.map(item => ({ id: item.id })) });
+
+    const settings = loadSettings();
+    if (!settings.reminderEnabled) return;
+    if ((await LocalNotifications.checkPermissions()).display !== 'granted') return;
+    await LocalNotifications.createChannel({
+      id: REMINDER_CHANNEL, name: 'Bedtime reminder', description: 'A nudge to write the day before bed', importance: 3
+    });
+
+    const written = new Set((await local.list()).map(row => row.name));
+    const notifications = [];
+    window.diaryReminder.upcoming(new Date(), settings.reminderTime, REMINDER_DAYS).forEach((at, index) => {
+      if (written.has(`${window.diaryReminder.dayFor(at, settings.dayStartHour)}.md`)) return;
+      notifications.push({
+        id: REMINDER_IDS + index,
+        title: "Time to write today's entry",
+        body: 'A few lines before bed is all it takes.',
+        channelId: REMINDER_CHANNEL,
+        smallIcon: 'ic_stat_diary',
+        schedule: { at, allowWhileIdle: true }
+      });
+    });
+    if (notifications.length) await LocalNotifications.schedule({ notifications });
+  }
+
+  /* Asked the moment the switch is turned on, not at launch, so the question comes with its reason. */
+  async function mayNotify() {
+    if (!LocalNotifications) return false;
+    try {
+      let { display } = await LocalNotifications.checkPermissions();
+      if (display !== 'granted') ({ display } = await LocalNotifications.requestPermissions());
+      return display === 'granted';
+    } catch {
+      return false;
+    }
   }
 
   /* ---------------------------------------------------------------- photos */
@@ -488,6 +554,13 @@
     const path = document.getElementById('settingsPath');
     const hint = path && path.parentElement && path.parentElement.querySelector('.field-hint');
     if (hint) hint.textContent = 'The folder on your Nextcloud this diary reads and writes. A copy is kept on this phone, so you can write offline.';
+    const reminderHint = document.getElementById('reminderHint');
+    if (reminderHint) reminderHint.textContent = 'A notification at this time if the day has not been written yet, whether or not the app is open.';
+
+    /* Tapping the reminder opens the app; it should open on the day it was about. */
+    if (LocalNotifications) {
+      LocalNotifications.addListener('localNotificationActionPerformed', () => fanOut(listeners.menu, 'today'));
+    }
 
     /* Choosing a day from the drawer is the end of what the drawer was opened for. */
     const sidebar = document.getElementById('sidebar');
@@ -596,6 +669,7 @@
         await engine.writeEntry(name, markdown);
         const stat = await local.stat(name);
         syncSoon();
+        scheduleReminders();
         return { ok: true, written: true, mtimeMs: stat ? stat.mtimeMs : Date.now() };
       } catch (error) {
         return fail((error && error.message) || 'That entry could not be saved');
@@ -629,9 +703,17 @@
     getSettings: async () => loadSettings(),
     setSettings: async (patch) => {
       if (!patch || typeof patch !== 'object') return fail('Nothing to change');
-      const next = { ...loadSettings(), ...JSON.parse(JSON.stringify(patch)) };
+      const before = loadSettings();
+      const next = { ...before, ...JSON.parse(JSON.stringify(patch)) };
       delete next.diaryPath;
+      let refused = false;
+      if (next.reminderEnabled && !before.reminderEnabled && !(await mayNotify())) {
+        next.reminderEnabled = false;
+        refused = true;
+      }
       writeJson(SETTINGS_KEY, next);
+      if (['reminderEnabled', 'reminderTime', 'dayStartHour'].some(key => next[key] !== before[key])) scheduleReminders();
+      if (refused) return { ok: false, error: 'Notifications are off for daily-diary — allow them in Android settings to get a reminder', settings: loadSettings() };
       return { ok: true, settings: loadSettings() };
     },
 

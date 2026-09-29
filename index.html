@@ -209,6 +209,14 @@
           </div>
 
           <div class="field-row">
+            <div><label class="field-label" for="reminderToggle">Bedtime reminder</label><div class="field-hint" id="reminderHint">A notification at this time if the day has not been written yet. Only while the app is open.</div></div>
+            <div class="field-control">
+              <input type="time" id="reminderTime" aria-label="Reminder time" />
+              <input type="checkbox" id="reminderToggle" />
+            </div>
+          </div>
+
+          <div class="field-row">
             <div>
               <div class="field-label">Diary folder</div>
               <div class="field-hint">Put this inside the folder your Nextcloud client syncs and the same diary opens on every device.</div>
@@ -243,6 +251,7 @@
 
     <script src="src/entry.js"></script>
     <script src="src/markdown.js"></script>
+    <script src="src/reminder.js"></script>
     <script src="src/settings.js"></script>
     <script src="src/store.js"></script>
     <script src="src/ui/dialog.js"></script>

@@ -1349,7 +1349,7 @@ kbd, .kbd {
   white-space: nowrap;
 }
 
-input[type='text'], input[type='number'], select {
+input[type='text'], input[type='number'], input[type='time'], select {
   padding: 7px 10px;
   border: 1px solid var(--line-control);
   border-radius: 7px;
@@ -1357,6 +1357,7 @@ input[type='text'], input[type='number'], select {
   color: var(--ink-2);
   font-size: var(--fs-base);
 }
+input[type='time']:disabled { opacity: 0.5; }
 input[type='range'] { accent-color: var(--accent); width: 170px; }
 input[type='checkbox'] { accent-color: var(--accent); width: 16px; height: 16px; }
 

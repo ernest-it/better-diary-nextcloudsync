@@ -173,6 +173,10 @@ and counted. The same view a tag gives you. Click an entry to open it; <kbd>Esc<
   diary day turns over at 4am, not midnight.
 - **Writing font** — sans or serif. This only changes how it looks here; the file is
   identical either way.
+- **Bedtime reminder** — off by default. Switch it on and pick a time, and you get a
+  notification then if the day has no entry yet; write something and it stays quiet. On
+  the desktop it only fires while the app is open. On Android it fires whether or not the
+  app is open, and the permission is asked for when you switch it on.
 - Theme, text size, autosave delay, spell check, and where the diary lives.
 
 ## Writing
@@ -280,6 +284,10 @@ syncing on a phone, so the app talks to your Nextcloud itself.
   wins — the same notice and buttons as the desktop.
 - **Photos** come down as you open the day they belong to, not all at once, and go up
   byte for byte. Deleting a day or a photo moves it to your Nextcloud trash bin.
+- **The bedtime reminder** is handed to Android a month ahead, one evening at a time, and
+  rescheduled every time you open the app, save, or sync in a day written elsewhere. So it
+  keeps coming if you forget the app for a few weeks, and a day you wrote on the laptop
+  does not nag you on the phone.
 - **https only.** Release builds refuse plain-http servers, because the login travels with
   every request.
 

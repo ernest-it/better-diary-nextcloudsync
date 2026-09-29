@@ -183,6 +183,7 @@ entries, or `sed` the folder.
 - `entry.test.js` — dates, filenames, parsing, writing out, headings
 - `roundtrip.test.js` — disk → editor → disk, which is what happens every time you type
 - `diary.test.js` — the filesystem layer against a real temporary folder
+- `reminder.test.js` — when the bedtime reminder is due, and which diary day it is about
 
 `npm run check` runs `node --check` over every `.js` file in `src/`, `build/` and `test/`, so
 a new file is covered the moment it lands.

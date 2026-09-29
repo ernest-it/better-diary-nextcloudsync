@@ -2,13 +2,14 @@
    channel the page is allowed to call. The renderer is sandboxed and never sees fs. */
 'use strict';
 
-const { app, BrowserWindow, ipcMain, dialog, shell, protocol } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, protocol, Notification } = require('electron');
 const fs = require('fs/promises');
 const fsSync = require('fs');
 const path = require('path');
 
 const diary = require('./diary.js');
 const entryModel = require('./entry.js');
+const reminder = require('./reminder.js');
 const menu = require('./menu.js');
 const windowState = require('./window-state.js');
 
@@ -41,7 +42,10 @@ const DEFAULT_SETTINGS = {
   /* Write at 1am and you mean yesterday. 0 makes the diary day start at plain midnight. */
   dayStartHour: 4,
   /* Purely how the writing area looks; the file on disk is identical either way. */
-  bodyFont: 'sans'
+  bodyFont: 'sans',
+  /* A notification at bedtime if the day has not been written yet. Off until asked for. */
+  reminderEnabled: false,
+  reminderTime: reminder.DEFAULT_TIME
 };
 
 let settings = { ...DEFAULT_SETTINGS };
@@ -63,6 +67,8 @@ function sanitizeSettings(patch, base) {
   if ('dayStartHour' in patch) next.dayStartHour = Math.round(clamp(patch.dayStartHour, 0, 12, base.dayStartHour));
   if (entryModel.TITLE_STYLES.includes(patch.titleStyle)) next.titleStyle = patch.titleStyle;
   if (['sans', 'serif'].includes(patch.bodyFont)) next.bodyFont = patch.bodyFont;
+  if ('reminderEnabled' in patch) next.reminderEnabled = Boolean(patch.reminderEnabled);
+  if ('reminderTime' in patch) next.reminderTime = reminder.normaliseTime(patch.reminderTime, base.reminderTime);
   if ('headings' in patch) {
     const list = entryModel.headingList(patch.headings).slice(0, 12);
     /* Never let the app end up with no sections at all — an entry would then be a bare date
@@ -202,6 +208,69 @@ function startRescanning() {
 function stopRescanning() {
   clearInterval(rescanTimer);
   rescanTimer = null;
+}
+
+/* ---------------------------------------------------------------- bedtime reminder
+
+   Only while the app is running — closing the window quits it, and there is no background
+   service to wake it again. The timer is re-armed at most a minute ahead rather than set for
+   the whole wait, because a laptop asleep through the evening would otherwise fire it late;
+   a reminder more than an hour overdue is dropped rather than shown the next morning. */
+
+const REMINDER_TICK = 60000;
+const REMINDER_STALE = 60 * 60 * 1000;
+let reminderTimer = null;
+let reminderDue = null;
+
+function scheduleReminder() {
+  clearTimeout(reminderTimer);
+  reminderTimer = null;
+  reminderDue = null;
+  if (!settings.reminderEnabled || !Notification.isSupported()) return;
+  reminderDue = reminder.nextAt(new Date(), settings.reminderTime);
+  armReminder();
+}
+
+function armReminder() {
+  clearTimeout(reminderTimer);
+  const wait = Math.max(0, Math.min(REMINDER_TICK, reminderDue.getTime() - Date.now()));
+  reminderTimer = setTimeout(() => { checkReminder().catch(() => {}); }, wait);
+}
+
+async function checkReminder() {
+  const due = reminderDue;
+  if (!due) return;
+  const late = Date.now() - due.getTime();
+  if (late < 0) { armReminder(); return; }
+  reminderDue = reminder.nextAt(new Date(), settings.reminderTime);
+  armReminder();
+  if (late > REMINDER_STALE) return;
+  /* An entry file only exists once something has been written in it. */
+  const day = reminder.dayFor(due, settings.dayStartHour);
+  let written = false;
+  try {
+    written = (await diary.list()).some(item => item.id === day);
+  } catch {
+    // An unreadable folder is no reason to stay quiet.
+  }
+  if (!written) showReminder();
+}
+
+function showReminder() {
+  const note = new Notification({
+    title: "Time to write today's entry",
+    body: 'A few lines before bed is all it takes.',
+    icon: iconPath()
+  });
+  note.on('click', () => {
+    if (!mainWindow || mainWindow.isDestroyed()) createWindow();
+    const win = mainWindow;
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
+    win.webContents.send('diary:menu', 'today');
+  });
+  note.show();
 }
 
 /* ---------------------------------------------------------------- window */
@@ -491,7 +560,9 @@ function registerIpc() {
   handle('settings:get', async () => settings);
   handle('settings:set', async (patch) => {
     const previousPath = settings.diaryPath;
+    const previousReminder = `${settings.reminderEnabled} ${settings.reminderTime}`;
     settings = sanitizeSettings(patch, settings);
+    if (`${settings.reminderEnabled} ${settings.reminderTime}` !== previousReminder) scheduleReminder();
     for (const win of BrowserWindow.getAllWindows()) win.webContents.session.setSpellCheckerEnabled(settings.spellcheck);
     const saved = await saveSettings();
     if (settings.diaryPath && settings.diaryPath !== previousPath) {
@@ -541,6 +612,7 @@ if (!app.requestSingleInstanceLock()) {
     menu.installMenu({ dev: DEV });
     createWindow();
     startWatching();
+    scheduleReminder();
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
@@ -553,6 +625,7 @@ if (!app.requestSingleInstanceLock()) {
     event.preventDefault();
     stopRescanning();
     stopWatching();
+    clearTimeout(reminderTimer);
     /* Never quit mid-sentence. diary.flush() only drains writes already handed to the main
        process; what you typed in the last few hundred milliseconds is still sitting in the
        page's autosave timer, so the page is asked to hand it over first. */
@@ -560,6 +633,9 @@ if (!app.requestSingleInstanceLock()) {
       .then(() => diary.flush())
       .finally(() => app.quit());
   });
+
+  /* Without this, Windows credits a dev run's notifications to "electron.app.Electron". */
+  if (process.platform === 'win32') app.setAppUserModelId('com.dailydiary.app');
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();

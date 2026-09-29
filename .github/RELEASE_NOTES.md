@@ -5,16 +5,30 @@ for the day, with the date and your headings already filled in.
 
 | You're on | Download |
 | --- | --- |
-| **Windows** | `daily-diary-Setup-0.5.0.exe` — the installer. Or `daily-diary-0.5.0-portable.exe` to run it without installing. |
-| **Debian / Ubuntu / Mint** | `daily-diary-0.5.0-linux-amd64.deb` — `sudo dpkg -i` it, or double-click. |
-| **Fedora / openSUSE** | `daily-diary-0.5.0-linux-x86_64.rpm` |
-| **Any other Linux** | `daily-diary-0.5.0-linux-x86_64.AppImage` — `chmod +x` it and run. |
-| **Android** | `daily-diary-0.5.0-android.apk` — open it on the phone and allow installing from your browser or Files app when asked. Android 7 or newer. |
+| **Windows** | `daily-diary-Setup-0.6.0.exe` — the installer. Or `daily-diary-0.6.0-portable.exe` to run it without installing. |
+| **Debian / Ubuntu / Mint** | `daily-diary-0.6.0-linux-amd64.deb` — `sudo dpkg -i` it, or double-click. |
+| **Fedora / openSUSE** | `daily-diary-0.6.0-linux-x86_64.rpm` |
+| **Any other Linux** | `daily-diary-0.6.0-linux-x86_64.AppImage` — `chmod +x` it and run. |
+| **Android** | `daily-diary-0.6.0-android.apk` — open it on the phone and allow installing from your browser or Files app when asked. Android 7 or newer. |
 
 The desktop builds are not code-signed, so Windows SmartScreen will warn on first run — **More info ▸
 Run anyway**.
 
-### New in 0.5.0 — the diary on your phone
+### New in 0.6.0 — a reminder before bed
+
+**Settings ▸ Bedtime reminder**: switch it on and pick a time. If the day has no entry by
+then, you get a notification. Once you have written something, it stays quiet. Tapping the
+notification opens today's entry. It is off until you turn it on.
+
+- **On Android** it arrives whether or not the app is open, and survives a restart. The
+  phone asks for notification permission when you switch it on. A day you wrote on the
+  laptop silences the phone's reminder once it has synced.
+- **On the desktop** it only arrives while the app is open, because closing the window
+  quits the app.
+- A reminder set for after midnight is about the evening before, following **A new day
+  starts at**.
+
+### Also new in 0.5.0 — the diary on your phone
 
 An Android app for the same diary, in the same folder. It logs in to your Nextcloud through
 Nextcloud's own login page in your browser — it gets an app password of its own, never your

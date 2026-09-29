@@ -1,6 +1,6 @@
 {
   "name": "daily-diary",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A daily diary that writes plain Markdown into your Nextcloud folder",
   "main": "src/main.js",
   "author": "ernest-it <161004105+ernest-it@users.noreply.github.com>",

@@ -1394,6 +1394,9 @@
     $('autosaveMs').value = String(settings.autosaveMs);
     $('autosaveValue').textContent = `${settings.autosaveMs} ms`;
     $('spellcheckToggle').checked = Boolean(settings.spellcheck);
+    $('reminderToggle').checked = Boolean(settings.reminderEnabled);
+    $('reminderTime').value = settings.reminderTime;
+    $('reminderTime').disabled = !settings.reminderEnabled;
     $('titleStyle').value = settings.titleStyle;
     $('dayStartHour').value = String(settings.dayStartHour);
     $('titleStylePreview').textContent = `Today reads: ${diaryEntry.formatTitle(todayId(), settings.titleStyle)}`;
@@ -1446,6 +1449,20 @@
       applySettings({ autosaveMs: value });
     });
     $('spellcheckToggle').addEventListener('change', (event) => applySettings({ spellcheck: event.target.checked }));
+    /* Turning it on can be refused — on a phone the permission is asked for right then — and
+       then the switch has to go back off rather than claim a reminder that will never come. */
+    $('reminderToggle').addEventListener('change', (event) => {
+      const on = event.target.checked;
+      $('reminderTime').disabled = !on;
+      diarySettings.set({ reminderEnabled: on }).then((result) => {
+        if (result.ok) return;
+        toast(result.error, true);
+        if (on) diarySettings.set({ reminderEnabled: false }).then(() => paintSettingsDialog());
+      });
+    });
+    $('reminderTime').addEventListener('change', (event) => {
+      if (diaryReminder.parseTime(event.target.value)) applySettings({ reminderTime: event.target.value });
+    });
     $('titleStyle').addEventListener('change', (event) => {
       applySettings({ titleStyle: event.target.value });
       $('titleStylePreview').textContent = `Today reads: ${diaryEntry.formatTitle(todayId(), event.target.value)}`;
